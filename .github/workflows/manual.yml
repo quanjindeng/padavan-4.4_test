@@ -111,12 +111,23 @@ jobs:
       - name: Prepare environment
         run: |
           sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
+          sudo apt install -y --no-install-recommends \
+          libtool-bin autoconf automake libtool libltdl-dev m4 pkg-config \
+          gperf python3-docutils autopoint gettext ccache build-essential
           echo "Compilation_time=$(TZ='Asia/Shanghai' date +%Y%m%d)" >> $GITHUB_ENV
       - name: Prepare toolchain
         run: |
           mkdir -p $TOOLCHAIN_ROOT
           curl -fSsLo- $TOOLCHAIN_URL/${{ matrix.toolchaingcc }}.tar.xz | tar Jxv -C $TOOLCHAIN_ROOT
+      - name: Prepare ipset sources (autoreconf)
+        run: |
+          # 解压并为 ipset 源生成缺失的 autotools 文件（configure / build-aux/*）
+          cd trunk/user/ipset
+          tar -xjf ipset-7.17.tar.bz2 || true
+          cd ipset-7.17 || exit 0
+          automake --add-missing --copy || true
+          aclocal -I /usr/share/aclocal || true
+          autoreconf -fi || true
       - name: Start build firmware
         run: |
           make ${{ matrix.target }} TOOLCHAIN=${{ matrix.toolchain }}
