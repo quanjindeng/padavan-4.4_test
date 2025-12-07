@@ -128,6 +128,9 @@ jobs:
           automake --add-missing --copy || true
           aclocal -I /usr/share/aclocal || true
           autoreconf -fi || true
+      - name: ipset fix
+        run: |
+          sed -i 's/switch (skb_protocol(skb, true))/switch (tc_skb_protocol(skb))/g' trunk/user/ipset/ipset-7.17/kernel/net/sched/em_ipset.c
       - name: Start build firmware
         run: |
           make ${{ matrix.target }} TOOLCHAIN=${{ matrix.toolchain }}
