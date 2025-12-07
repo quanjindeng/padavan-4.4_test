@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [B70]
-        toolchain: [mipsel-linux-uclibc]
+        target: [K2P,RM2100,B70]
+        toolchain: [mipsel-linux-musl]
     steps:
       - uses: actions/checkout@main
       - uses: hendrikmuhs/ccache-action@main
